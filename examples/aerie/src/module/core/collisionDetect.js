@@ -62,15 +62,31 @@ var collisionDetect = {
       }
       
       if(item[kItem].image.originalCanvas === undefined) {
+
         var image = item[kItem].image ;
         var imageK = get_image_data(image) ;
+
       } else {
+
         var image = item[kItem].image.originalCanvas ;
         var imageK = get_image_data(item[kItem].image.originalCanvas) ;
+
       }
 
-      var itemX = Math.round(item[kItem].x - item[kItem].viz.viewportX) ;
-      var itemY = Math.round(item[kItem].y - item[kItem].viz.viewportY) ;
+      if ( item[kItem].viz !== undefined ) {
+
+        var xOrigin = item[kItem].viz.viewportX ;
+        var yOrigin = item[kItem].viz.viewportY ;        
+
+      } else {
+
+        var xOrigin = 0 ;
+        var yOrigin = 0 ;        
+
+      }
+
+      var itemX = Math.round(item[kItem].x - xOrigin) ;
+      var itemY = Math.round(item[kItem].y - yOrigin) ;
 
       // context.drawImage(image, itemX, itemY) ;
 
@@ -85,7 +101,7 @@ var collisionDetect = {
       var jEnd   = Math.max(0, Math.min(width, itemX + imageK.width)) ;
 
       // var NimagePel = image.width * image.height ;
-      var NmaxPel = 40000 ; // skip some pixels if there are more than this many to maintain high annimation framerate
+      var NmaxPel = 4000 ; // skip some pixels if there are more than this many to maintain high annimation framerate
       var Nskip   = Math.ceil ( Npel / NmaxPel ) ; // only use a subset of pixels if the image is too large
 
       // console.log('collisionDetection: ', 'Npel', Npel, 'Nskip', Nskip) ;

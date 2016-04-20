@@ -1,8 +1,12 @@
 var inputEvent = {
   
-  down: function input_event_down (event) {
+  down: function input_event_down (event, doc) {
 
-    // console.log ('event down', 'this', this, 'this.viz', this.viz, 'event', event) ;    
+    if ( doc === undefined ) {
+      doc = this ; 
+    }
+
+    // console.log ('event down', 'this', this, 'doc.viz', doc.viz, 'event', event) ;    
 
     var inputHandler ;
     var eventList ;
@@ -10,96 +14,74 @@ var inputEvent = {
     switch (event.type) {
 
       case 'keydown': 
-        inputHandler = 'keyboard_down' ;
+        inputHandler = 'keyboard' ;
         eventList = event ;
         break;
       case 'mousedown': 
-        inputHandler = 'screen_down' ;
+        inputHandler = 'screen' ;
         eventList = event ;
         break;
       case 'touchstart':
-        inputHandler = 'screen_down' ;
+        inputHandler = 'screen' ;
         eventList = event.touches ;
         break;
 
     }     
   
-    var prep = $Z._prep ;
-
     // console.log('input event: ', 'prep', prep) ;
 
     function run_click () {
-      // console.log('input event run click:', 'inputHandler', inputHandler, 'eventList', eventList) ;
+      // console.log('input event run click:', 'inputHandler', inputHandler) ;
       if(event.type === 'touchstart') {
         for(var kEvent = 0 ; kEvent < eventList.length ; kEvent++) {
-          this.viz.input.response[inputHandler].call ( this.viz, eventList[kEvent] ) ;        
+          doc.viz.input.response[inputHandler].call ( doc.viz, eventList[kEvent] ) ;        
         }        
       } else {
-        this.viz.input.response[inputHandler].call ( this.viz, eventList ) ;        
+        doc.viz.input.response[inputHandler].call ( doc.viz, eventList ) ;        
       }
-
-      $Z.prep(prep) ;
 
     }
 
     var runClick = { 
       prep: run_click, 
-      viz: this.viz 
+      viz: doc.viz 
     } ;
 
-    var newPrep = prep.slice(0) ;
-    newPrep.push(runClick) ;
+    $Z._prep.push(runClick) ;
   
     // console.log('input event: ', 'newPrep', newPrep) ;
-
-    $Z.prep (newPrep) ;
     //console.log ('mousedown: holding', holding, 'event', event) ;
   },
 
-  up: function input_event_up (event) {
+  up: function input_event_up (event, doc) {
 
-    //console.log('input event up', 'this', this) ;
-    switch (event.type) {
+    if ( doc === undefined ) {
+      doc = this ;
+    }
 
-      case 'keyup': 
-        this.viz.input.response.keyboard_up.call(this.viz, event) ;
-        break;
-      case 'mouseup': 
-        break;
-      case 'touchend':
-        break;
+    $Z.prep([doc.viz]) ;
 
-    }     
+    // console.log('input event up', 'this', this) ;
+
     // console.log ('input event up end', 'event', event) ;
 
   },
 
   response: {
-
-    keyboard_up: function input_event_response_keyboard_up (event, viz) {
-      // console.log('input event response keyboard up start') ;
-      if (viz === undefined) {
-        viz = this ;
-      }
-      if ( viz.keyboard_up_callback !== undefined ) {
-        viz.keyboard_up_callback(event) ;       
-      }
-
-    },
         
-    keyboard_down: function input_event_response_keyboard_down (event, viz) {
+    keyboard: function input_event_response_keyboard (event, viz) {
 
       if(viz === undefined) {
         viz = this ;
       }
-      // console.log('keyboard_callback', keyboard_callback) ;
-      if ( viz.keyboard_down_callback !== undefined ) {
-        viz.keyboard_down_callback(event) ; 
+
+      if ( viz.keyboard_callback !== undefined ) {
+        viz.keyboard_callback(event) ; 
       }
 
     },
 
-    screen_down: function input_event_response_screen_down (event, viz) {
+    screen: function input_event_response_screen (event, viz) {
 
       if(viz === undefined) {
         viz = this ;
